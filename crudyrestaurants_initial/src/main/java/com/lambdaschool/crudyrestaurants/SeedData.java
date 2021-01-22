@@ -1,6 +1,7 @@
 package com.lambdaschool.crudyrestaurants;
 
-//import com.github.javafaker.Faker;
+import com.github.javafaker.Faker;
+
 import com.lambdaschool.crudyrestaurants.models.Menu;
 import com.lambdaschool.crudyrestaurants.models.Payment;
 import com.lambdaschool.crudyrestaurants.models.Restaurant;
@@ -11,7 +12,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 
 
 /**
@@ -136,7 +140,7 @@ public class SeedData implements CommandLineRunner
                 .add(pay3);
         restaurantServices.save(r3);
 
-        /*
+
         // using JavaFaker create a bunch of regular restaurants
         // https://www.baeldung.com/java-faker
         // https://www.baeldung.com/regular-expressions-java
@@ -182,6 +186,5 @@ public class SeedData implements CommandLineRunner
             restaurantServices.save(fakeRestaurant);
         }
 
-         */
     }
 }

@@ -1,9 +1,9 @@
 package com.lambdaschool.crudyrestaurants.services;
 
-import com.lambdaschool.crudyrestaurants.models.Restaurant;
 import com.lambdaschool.crudyrestaurants.views.MenuCounts;
 
 import java.util.List;
+
 
 /**
  * The Service that works with the Restaurant Model.
