@@ -6,4 +6,5 @@ public interface PaymentServices {
 
     Payment save(Payment payment);
 
+    void deleteAllPayments();
 }

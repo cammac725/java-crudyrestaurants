@@ -42,8 +42,8 @@ public class RestaurantServicesImpl implements RestaurantServices {
     }
 
     @Override
-    public List<Restaurant> findByNameLike(String subname) {
-        List<Restaurant> list = restrepos.findByNameContainingIgnoringCase(subname);
+    public List<Restaurant> findByNameLike(String thename) {
+        List<Restaurant> list = restrepos.findByNameContainingIgnoringCase(thename);
         return list;
     }
 
@@ -54,8 +54,8 @@ public class RestaurantServicesImpl implements RestaurantServices {
     }
 
     @Override
-    public List<Restaurant> findRestaurantByDish(String dish) {
-        List<Restaurant> list = restrepos.findByMenus_dishContainingIgnoringCase(dish);
+    public List<Restaurant> findRestaurantByDish(String thedish) {
+        List<Restaurant> list = restrepos.findByMenus_dishContainingIgnoringCase(thedish);
         return list;
     }
 
@@ -63,5 +63,24 @@ public class RestaurantServicesImpl implements RestaurantServices {
     @Override
     public Restaurant save(Restaurant restaurant) {
         return restrepos.save(restaurant);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllRestaurants() {
+        restrepos.deleteAll();
+    }
+
+    @Transactional
+    @Override
+    public void delete(long restaurantid) {
+//        if (restrepos.findById(restaurantid).isPresent()) {
+//            restrepos.deleteById(restaurantid);
+        Restaurant r = findRestaurantById(restaurantid);
+        if (r != null) {
+            restrepos.deleteById(restaurantid);
+        } else {
+            throw new EntityNotFoundException("Restaurant " + restaurantid + " not found.");
+        }
     }
 }

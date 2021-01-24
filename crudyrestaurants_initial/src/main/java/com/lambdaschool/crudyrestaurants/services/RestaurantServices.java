@@ -23,4 +23,7 @@ public interface RestaurantServices {
 
     Restaurant save(Restaurant restaurant);
 
+    void deleteAllRestaurants();
+
+    void delete(long restaurantid);
 }
