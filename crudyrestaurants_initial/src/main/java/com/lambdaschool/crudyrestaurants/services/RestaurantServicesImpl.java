@@ -1,6 +1,9 @@
 package com.lambdaschool.crudyrestaurants.services;
 
+import com.lambdaschool.crudyrestaurants.models.Menu;
+import com.lambdaschool.crudyrestaurants.models.Payment;
 import com.lambdaschool.crudyrestaurants.models.Restaurant;
+import com.lambdaschool.crudyrestaurants.repositories.PaymentRepository;
 import com.lambdaschool.crudyrestaurants.repositories.RestaurantRepository;
 import com.lambdaschool.crudyrestaurants.views.MenuCounts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,9 @@ public class RestaurantServicesImpl implements RestaurantServices {
 
     @Autowired
     private RestaurantRepository restrepos;
+
+    @Autowired
+    private PaymentRepository paymentrepos;
 
     @Override
     public List<Restaurant> findAllRestaurants() {
@@ -59,10 +65,90 @@ public class RestaurantServicesImpl implements RestaurantServices {
         return list;
     }
 
+    // Valid data
     @Transactional
     @Override
     public Restaurant save(Restaurant restaurant) {
-        return restrepos.save(restaurant);
+        Restaurant newRestaurant = new Restaurant();
+
+        if (restaurant.getRestaurantid() != 0) {
+            findRestaurantById(restaurant.getRestaurantid());
+            newRestaurant.setRestaurantid(restaurant.getRestaurantid());
+        }
+        // single value fields
+        newRestaurant.setName(restaurant.getName());
+        newRestaurant.setAddress(restaurant.getAddress());
+        newRestaurant.setCity(restaurant.getCity());
+        newRestaurant.setState(restaurant.getState());
+        newRestaurant.setTelephone(restaurant.getTelephone());
+        newRestaurant.setSeatcapacity(restaurant.getSeatcapacity());
+
+        // collections
+        // payment must already exist
+        newRestaurant.getPayments().clear();
+        for (Payment p : restaurant.getPayments()) {
+            Payment newPayment = paymentrepos.findById(p.getPaymentid())
+                    .orElseThrow(() -> new EntityNotFoundException("Payment " + p.getPaymentid() + " not found."));
+            newRestaurant.getPayments().add(newPayment);
+        }
+
+        newRestaurant.getMenus().clear();
+        for (Menu m : restaurant.getMenus()) {
+            Menu newMenu = new Menu(m.getDish(), m.getPrice(), newRestaurant);
+            newRestaurant.getMenus().add(newMenu);
+        }
+
+        // primary key, id = 0 ?, it does an Add
+        //                != 0 ?, it does an Update (delete then add)
+        return restrepos.save(newRestaurant);
+    }
+
+    @Transactional
+    @Override
+    public Restaurant update(Restaurant restaurant, long restid) {
+        Restaurant updateRestaurant = findRestaurantById(restid);
+
+        // single value fields
+
+        if(restaurant.getName() != null) {
+            updateRestaurant.setName(restaurant.getName());
+        }
+        if (restaurant.getAddress() != null) {
+            updateRestaurant.setAddress(restaurant.getAddress());
+        }
+        if (restaurant.getCity() != null) {
+            updateRestaurant.setCity(restaurant.getCity());
+        }
+        if (restaurant.getState() != null) {
+            updateRestaurant.setState(restaurant.getState());
+        }
+        if (restaurant.getTelephone() != null) {
+            updateRestaurant.setTelephone(restaurant.getTelephone());
+        }
+        if (restaurant.hasvalueforseatcapacity) {
+            updateRestaurant.setSeatcapacity(restaurant.getSeatcapacity());
+        }
+
+        // collections
+        // payment must already exist
+        if (restaurant.getPayments().size() > 0) {
+            updateRestaurant.getPayments().clear();
+            for (Payment p : restaurant.getPayments()) {
+                Payment newPayment = paymentrepos.findById(p.getPaymentid())
+                        .orElseThrow(() -> new EntityNotFoundException("Payment " + p.getPaymentid() + " not found."));
+                updateRestaurant.getPayments().add(newPayment);
+            }
+        }
+
+        if (restaurant.getMenus().size() > 0) {
+            updateRestaurant.getMenus().clear();
+            for (Menu m : restaurant.getMenus()) {
+                Menu newMenu = new Menu(m.getDish(), m.getPrice(), updateRestaurant);
+                updateRestaurant.getMenus().add(newMenu);
+            }
+        }
+
+        return restrepos.save(updateRestaurant);
     }
 
     @Transactional

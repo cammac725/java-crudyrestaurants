@@ -13,6 +13,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "restaurants")
+@JsonIgnoreProperties(value = "hasvalueforseatcapacity")
 public class Restaurant
 {
     /**
@@ -53,6 +54,8 @@ public class Restaurant
      * The seating capacity (integer) of the restaurant.
      * This was added to specifically show how to update fields that do not have a NULL value.
      */
+    @Transient
+    public boolean hasvalueforseatcapacity = false;
     private int seatcapacity;
 
     @OneToMany(mappedBy = "restaurant",
@@ -243,6 +246,7 @@ public class Restaurant
      */
     public void setSeatcapacity(int seatcapacity)
     {
+        hasvalueforseatcapacity = true;
         this.seatcapacity = seatcapacity;
     }
 

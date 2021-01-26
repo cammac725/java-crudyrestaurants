@@ -26,4 +26,8 @@ public interface RestaurantServices {
     void deleteAllRestaurants();
 
     void delete(long restaurantid);
+
+    Restaurant update(
+            Restaurant restaurant,
+            long restid);
 }

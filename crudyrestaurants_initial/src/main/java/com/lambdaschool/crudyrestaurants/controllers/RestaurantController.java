@@ -23,7 +23,8 @@ public class RestaurantController {
 
     // C => POST
     // R => GET
-    // U =>
+    // U => PUT (complete replace)
+    //   => PATCH (updates)
     // D => DELETE
 
     // READ operations (GET requests)
@@ -83,8 +84,11 @@ public class RestaurantController {
 
     // http://localhost:2019/restaurants/restaurant
     // Data => request body
+    // Jackson -> creates the object using the default constructor
+    //         -> fills in data using setters
     @PostMapping(value = "/restaurant", consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> addNewRestaurant(@Valid @RequestBody Restaurant newRestaurant) {
+        newRestaurant.setRestaurantid(0); // in case user sends their own id
         newRestaurant = restaurantServices.save(newRestaurant);
 
         // Response Headers -> Location Header = url to the new restaurant
@@ -95,8 +99,33 @@ public class RestaurantController {
                 .buildAndExpand(newRestaurant.getRestaurantid())
                 .toUri();
         responseHeaders.setLocation(newRestaurantURI);
-        return new ResponseEntity<>(newRestaurant, responseHeaders, HttpStatus.CREATED);
+
+        // the norm but insecure, req and res contain same info, 2x vector for hackers:
+        // return new ResponseEntity<>(newRestaurant, responseHeaders, HttpStatus.CREATED);
+        // let's not return the body instead
+        return new ResponseEntity<>(null, responseHeaders, HttpStatus.CREATED);
     }
 
+    // UPDATE operations
+
+    // (PUT)
+    // http://localhost:2019/restaurants/restaurant/{id}
+    // Data => request body
+    @PutMapping(value = "/restaurant/{restid}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> updateFullRestaurant(@PathVariable long restid,
+                                                  @Valid @RequestBody Restaurant updateRestaurant) {
+        updateRestaurant.setRestaurantid(restid);
+        updateRestaurant = restaurantServices.save(updateRestaurant);
+
+        return new ResponseEntity<>(updateRestaurant, HttpStatus.OK);
+    }
+
+    // (PATCH)
+    // http://localhost:2019/restaurants/restaurant/{id}
+    @PatchMapping(value = "/restaurant/{restid}", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> updatePartRestaurant(@PathVariable long restid, @RequestBody Restaurant updateRestaurant) {
+        updateRestaurant = restaurantServices.update(updateRestaurant, restid);
+        return new ResponseEntity<>(updateRestaurant,HttpStatus.OK);
+    }
 
 }
